@@ -800,7 +800,7 @@ class StackTraceImpl<system_tag::darwin_tag>: public StackTraceDarwinImplHolder 
 public:
 	__attribute__ ((noinline)) // TODO use some macro
 	size_t load_here(size_t depth=32) {
-		printf("load_here\n");
+		printf("load_here %lu\n", depth);
 		load_thread_info();
 		if (depth == 0) {
 			printf("load_here depth == 0\n");
@@ -808,6 +808,7 @@ public:
 		}
 		_stacktrace.resize(depth + 1);
 		size_t trace_cnt = backtrace(&_stacktrace[0], _stacktrace.size());
+		printf("load_here initially got %lu\n", trace_cnt);
 		_stacktrace.resize(trace_cnt);
 		skip_n_firsts(1);
 		printf("load_here got %lu\n", size());
@@ -2282,8 +2283,10 @@ private:
 #	warning ":/ sorry, ain't know no nothing none not of your architecture!"
 #endif
 		if (error_addr) {
+			puts("got error addr");
 			st.load_from(error_addr, 32);
 		} else {
+			puts("no error addr");
 			st.load_here(32);
 		}
 
