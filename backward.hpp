@@ -807,6 +807,7 @@ public:
 			return 0;
 		}
 		_stacktrace.resize(depth + 1);
+		printf("load_here asking for %lu\n", _stacktrace.size());
 		size_t trace_cnt = backtrace(&_stacktrace[0], _stacktrace.size());
 		printf("load_here initially got %lu\n", trace_cnt);
 		_stacktrace.resize(trace_cnt);
