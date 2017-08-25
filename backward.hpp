@@ -800,18 +800,22 @@ class StackTraceImpl<system_tag::darwin_tag>: public StackTraceDarwinImplHolder 
 public:
 	__attribute__ ((noinline)) // TODO use some macro
 	size_t load_here(size_t depth=32) {
+		printf("load_here\n");
 		load_thread_info();
 		if (depth == 0) {
+			printf("load_here depth == 0\n");
 			return 0;
 		}
 		_stacktrace.resize(depth + 1);
 		size_t trace_cnt = backtrace(&_stacktrace[0], _stacktrace.size());
 		_stacktrace.resize(trace_cnt);
 		skip_n_firsts(1);
+		printf("load_here got %lu\n", size());
 		return size();
 	}
 
 	size_t load_from(void* addr, size_t depth=32) {
+		printf("load_from\n");
 		load_here(depth + 8);
 
 		for (size_t i = 0; i < _stacktrace.size(); ++i) {
@@ -824,6 +828,7 @@ public:
 
 		_stacktrace.resize(std::min(_stacktrace.size(),
 					    skip_n_firsts() + depth));
+		printf("load_from got %lu\n", size());
 		return size();
 	}
 };
@@ -844,7 +849,7 @@ template <>
 class TraceResolverImpl<system_tag::unknown_tag> {
 public:
 	template <class ST>
-		void load_stacktrace(ST&) {}
+		void load_stacktrace(ST&) { printf("load_stack trace disabled\n"); }
 	ResolvedTrace resolve(ResolvedTrace t) {
 		return t;
 	}
@@ -1651,6 +1656,7 @@ public:
 		void load_stacktrace(ST& st) {
 			using namespace details;
 			if (st.size() == 0) {
+				printf("darwin: empty stack trace\n");
 				return;
 			}
 			_symbols.reset(
